@@ -1,0 +1,77 @@
+version: '3.7'
+
+services:
+
+  kv-auth:
+    image: kv/auth:latest
+    container_name: kv-auth
+    expose:
+      - 8101
+    restart: on-failure
+    ports:
+      - 8101:8101
+#    depends_on:
+#      - kv-keto
+
+  kv-device:
+    image: kv/device:latest
+    container_name: kv-device
+    restart: always
+    expose:
+      - 8100
+    ports:
+      - 8100:8100
+    depends_on:
+      - kv-auth
+    volumes:
+      - /var/log:/var/log
+      - /var/www/kv/static:/static
+  mysql:
+    # 镜像名
+    image: mysql:8.0.21
+    # 容器名(以后的控制都通过这个)
+    container_name: rcs_mysql8.0
+    privileged: true
+    # 重启策略
+    restart: always
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      # root 密码
+      MYSQL_ROOT_PASSWORD: root
+      # 初始化数据库(后续的初始化sql会在这个库执行)
+      MYSQL_DATABASE: kv-services
+      # 初始化用户(不能是root 会报错, 后续需要给新用户赋予权限)
+      MYSQL_USER: admin
+      # 用户密码
+      MYSQL_PASSWORD: admin
+      # 映射端口
+    ports:
+      - 3306:3306
+#    volumes:
+#      # 数据挂载 首次挂载清除宿主机的 data目录
+#      - ./mysql/data/:/var/lib/mysql/
+#      # 配置挂载
+#      - ./mysql/conf/:/etc/mysql/conf.d
+#      - ./mysql/init/:/docker-entrypoint-initdb.d/
+    command:
+      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+    #--lower_case_table_names=1
+
+
+#  kv-grafana:
+#    image: grafana/grafana:8.4.2
+#    container_name: kv-grafana
+#    depends_on:
+#      - kv-influxdb
+#    restart: on-failure
+#    ports:
+#      - 3000:3000
+#    volumes:
+#      - /var/log:/var/log
+#      - kv-grafana-volume:/var/lib/grafana
+

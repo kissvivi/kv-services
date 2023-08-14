@@ -24,7 +24,7 @@
 * 使用了泛型解决最基础的增删改查
 * 此项目由v-services与kv-iot开发实践中总结而来，后面会有持续优化
 
-### ✨ [kv-services 文档地址/问题记录](http://doc.kv-services.cn/)
+### ✨ [kv-services 文档地址/问题记录](http://doc.kv-iot.cn/)
 
 ### 前端开源地址
 * 暂无，开发中
